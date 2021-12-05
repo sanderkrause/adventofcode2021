@@ -17,12 +17,12 @@ $lines = file('input.txt');
 //    '5,5 -> 8,2',
 //];
 
-function parseCoords(array $lines): array {
+function parseCoords(array $lines, $diagonal = false): array {
     $coords = [];
     foreach ($lines as $coordLine) {
         if (preg_match('/(\d+),(\d+)\s+->\s+(\d+),(\d+)/', $coordLine, $parsed)) {
             // Only consider straight lines
-            if ($parsed[1] === $parsed[3] || $parsed[2] === $parsed[4]) {
+            if ($diagonal || $parsed[1] === $parsed[3] || $parsed[2] === $parsed[4]) {
                 $coords[] = [
                     'x1' => (int)$parsed[1],
                     'y1' => (int)$parsed[2],
@@ -66,7 +66,52 @@ function partOne(array $lines) {
 }
 
 function partTwo(array $lines) {
+
+    $coords = parseCoords($lines, true);
+    $coordsHit = [];
+
+    // Generate a list of points hit in line
+    foreach ($coords as $coordLine) {
+        ['x1' => $x1, 'x2' => $x2, 'y1' => $y1, 'y2' => $y2] = $coordLine;
+        if ($x1 === $x2) {
+            $lowY = min($y1, $y2);
+            $highY = max($y1, $y2);
+            for ($i=$lowY; $i<=$highY; $i++) {
+                $coordsHit[] = "$x1,$i";
+            }
+        }
+        elseif ($y1 === $y2) {
+            $lowX = min($x1, $x2);
+            $highX = max($x1, $x2);
+            for ($i=$lowX; $i<=$highX; $i++) {
+                $coordsHit[] = "$i,$y1";
+            }
+        }
+        else {
+//            echo "Diagonal line $x1,$y1 -> $x2,$y2\n";
+//            echo "Adding $x1,$y1\n";
+            $coordsHit[] = "$x1,$y1";
+            $x = $x1;
+            $y = $y1;
+            do {
+                if ($x1 < $x2) {
+                    $x++;
+                } else {
+                    $x--;
+                }
+                if ($y1 < $y2) {
+                    $y++;
+                } else {
+                    $y--;
+                }
+//                echo "Adding $x,$y\n";
+                $coordsHit[] = "$x,$y";
+            } while ("$x,$y" !== "$x2,$y2");
+        }
+    }
+
+    return count(array_filter(array_count_values($coordsHit), fn($c) => $c >= 2));
 }
 
 echo partOne($lines) . PHP_EOL;
-//echo partTwo($lines) . PHP_EOL;
+echo partTwo($lines) . PHP_EOL;
