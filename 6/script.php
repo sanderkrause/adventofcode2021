@@ -31,15 +31,24 @@ function partOne(array $lines, int $numDays) {
     return count($ages);
 }
 
-function partTwo(array $lines) {
+function partTwo(array $lines, int $numDays) {
 
     $ages = parseLines($lines);
-    $fishCount = array_count_values($lines);
-    for ($day=1; $day<=256; $day++) {
-        // @todo now what?
+    $fishCount = array_count_values($ages);
+    for ($day=1; $day<=$numDays; $day++) {
+        $resetFish = $fishCount[0] ?? 0;
+        $fishCount[0] = $fishCount[1] ?? 0;
+        $fishCount[1] = $fishCount[2] ?? 0;
+        $fishCount[2] = $fishCount[3] ?? 0;
+        $fishCount[3] = $fishCount[4] ?? 0;
+        $fishCount[4] = $fishCount[5] ?? 0;
+        $fishCount[5] = $fishCount[6] ?? 0;
+        $fishCount[6] = ($fishCount[7] ?? 0) + $resetFish;
+        $fishCount[7] = $fishCount[8] ?? 0;
+        $fishCount[8] = $resetFish;
     }
     return array_sum($fishCount);
 }
 
 echo partOne($lines, 80) . PHP_EOL;
-//echo partTwo($lines) . PHP_EOL;
+echo partTwo($lines, 256) . PHP_EOL;
