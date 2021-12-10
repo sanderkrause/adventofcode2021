@@ -12,21 +12,26 @@ $lines = file('input.txt');
 //    '9899965678',
 //];
 
-function parseInput(array $lines) {
+function parseInput(array $lines)
+{
     return array_map(fn($l) => str_split(trim($l)), $lines);
 }
 
-function findLowestPoints(array $input) {
+function findLowestPoints(array $input)
+{
     $lowPoints = [];
-    for ($y=0; $y<count($input); $y++) {
-        for ($x=0; $x<count($input[$y]); $x++) {
+    for ($y = 0; $y < count($input); $y++) {
+        for ($x = 0; $x < count($input[$y]); $x++) {
             $point = (int)$input[$y][$x];
-            $surroundings = array_map(fn($i) => (int) $i, array_filter([
-                   'top' => $input[$y-1][$x] ?? null,
-                   'bottom' => $input[$y+1][$x] ?? null,
-                   'left' => $input[$y][$x-1] ?? null,
-                   'right' => $input[$y][$x+1] ?? null,
-               ], fn($i) => $i !== null));
+            $surroundings = array_map(
+                fn($i) => (int)$i,
+                array_filter([
+                                 'top' => $input[$y - 1][$x] ?? null,
+                                 'bottom' => $input[$y + 1][$x] ?? null,
+                                 'left' => $input[$y][$x - 1] ?? null,
+                                 'right' => $input[$y][$x + 1] ?? null,
+                             ], fn($i) => $i !== null)
+            );
 //            echo "Checking surroundings of $x,$y ($point)...\n";
             $lowestSurroundingValue = min($surroundings);
             if ($lowestSurroundingValue > $point) {
@@ -42,8 +47,8 @@ function findLowestPoints(array $input) {
     return $lowPoints;
 }
 
-function checkLeft(array $grid, int $startX, int $startY, array &$coords) {
-
+function checkLeft(array $grid, int $startX, int $startY, array &$coords)
+{
     while (isset($grid[$startY][--$startX]) && !in_array("$startY,$startX", $coords, true)) {
 //        echo "[LEFT] grid[$startY][$startX] == {$grid[$startY][$startX]}\n";
         if ($grid[$startY][$startX] != 9) {
@@ -56,9 +61,9 @@ function checkLeft(array $grid, int $startX, int $startY, array &$coords) {
     }
 }
 
-function checkRight(array $grid, int $startX, int $startY, array &$coords) {
-
-    while(isset($grid[$startY][++$startX]) && !in_array("$startY,$startX", $coords, true)) {
+function checkRight(array $grid, int $startX, int $startY, array &$coords)
+{
+    while (isset($grid[$startY][++$startX]) && !in_array("$startY,$startX", $coords, true)) {
 //        echo "[RIGHT] grid[$startY][$startX] == {$grid[$startY][$startX]}\n";
         if ($grid[$startY][$startX] != 9) {
             $coords[] = "$startY,$startX";
@@ -70,9 +75,9 @@ function checkRight(array $grid, int $startX, int $startY, array &$coords) {
     }
 }
 
-function checkUp(array $grid, int $startX, int $startY, array &$coords) {
-
-    while(isset($grid[--$startY][$startX]) && !in_array("$startY,$startX", $coords, true)) {
+function checkUp(array $grid, int $startX, int $startY, array &$coords)
+{
+    while (isset($grid[--$startY][$startX]) && !in_array("$startY,$startX", $coords, true)) {
 //        echo "[UP] grid[$startY][$startX] == {$grid[$startY][$startX]}\n";
         if ($grid[$startY][$startX] != 9) {
             $coords[] = "$startY,$startX";
@@ -84,8 +89,8 @@ function checkUp(array $grid, int $startX, int $startY, array &$coords) {
     }
 }
 
-function checkDown(array $grid, int $startX, int $startY, array &$coords) {
-
+function checkDown(array $grid, int $startX, int $startY, array &$coords)
+{
     while (isset($grid[++$startY][$startX]) && !in_array("$startY,$startX", $coords, true)) {
 //        echo "[DOWN] grid[$startY][$startX] == {$grid[$startY][$startX]}\n";
         if ($grid[$startY][$startX] != 9) {
