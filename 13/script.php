@@ -91,8 +91,16 @@ function foldPage(array $page, string $axis, int $position): array
         for ($y=0; $y<count($page); $y++) {
             $page[$y][$position] = '|';
         }
-        // @todo fold by merging right into left?
-        // @todo don't forget to reduce the size of the page array after merging
+
+        for ($y=0; $y<count($page); $y++) {
+            $dots = array_reverse(array_slice($page[$y], $position));
+            foreach ($dots as $x => $dot) {
+                if ($dot === '#') {
+                    $page[$y][$x] = '#';
+                }
+            }
+            $page[$y] = array_slice($page[$y], 0, $position);
+        }
     }
 
     return $page;
@@ -118,19 +126,23 @@ function partOne(array $lines)
 {
     $input = parseInput($lines);
     $page = buildPage(max($input['x']), max($input['y']), $input['marked']);
-//    printPage($page);die;
 
-    foreach ($input['folds'] as $fold) {
-        ['axis' => $foldAxis, 'position' => $foldPosition] = $fold;
-        $foldedPage = foldPage($page, $foldAxis, $foldPosition);
-//        printPage($foldedPage);
-        // Just the first fold instruction
-        return countDots($foldedPage);
-    }
+    $firstFold = array_shift($input['folds']);
+    ['axis' => $foldAxis, 'position' => $foldPosition] = $firstFold;
+    $page = foldPage($page, $foldAxis, $foldPosition);
+    return countDots($page);
 }
 
 function partTwo(array $lines)
 {
+    $input = parseInput($lines);
+    $page = buildPage(max($input['x']), max($input['y']), $input['marked']);
+
+    foreach ($input['folds'] as $fold) {
+        ['axis' => $foldAxis, 'position' => $foldPosition] = $fold;
+        $page = foldPage($page, $foldAxis, $foldPosition);
+    }
+    printPage($page);
 }
 
 echo partOne($lines) . PHP_EOL;
